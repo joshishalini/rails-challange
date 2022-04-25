@@ -39,7 +39,7 @@ class ActivitiesController < ApplicationController
     else
       session[:activity_step] = session[:activity_params] = nil
       flash[:notice] = "Activity saved."
-      redirect_to @activity
+      redirect_to activities_path
     end
   end
 
