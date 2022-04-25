@@ -12,7 +12,9 @@ class ActivitiesController < ApplicationController
 
   # GET /activities/new
   def new
-    @activity = Activity.new
+    session[:activity_params] ||= {}
+    @activity = Activity.new(session[:activity_params])
+    @activity.current_step = session[:activity_step]
   end
 
   # GET /activities/1/edit
@@ -21,16 +23,23 @@ class ActivitiesController < ApplicationController
 
   # POST /activities or /activities.json
   def create
-    @activity = Activity.new(activity_params)
-
-    respond_to do |format|
-      if @activity.save
-        format.html { redirect_to activity_url(@activity), notice: "Activity was successfully created." }
-        format.json { render :show, status: :created, location: @activity }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @activity.errors, status: :unprocessable_entity }
-      end
+    session[:activity_params].deep_merge!(activity_params) if params[:activity]
+    @activity = Activity.new(session[:activity_params])
+    @activity.current_step = session[:activity_step]
+    if params[:back_button]
+      @activity.previous_step
+    elsif @activity.last_step?
+      @activity.save
+    else
+      @activity.next_step
+    end
+    session[:activity_step] = @activity.current_step
+    if @activity.new_record?
+      render 'new'
+    else
+      session[:activity_step] = session[:activity_params] = nil
+      flash[:notice] = "Activity saved."
+      redirect_to @activity
     end
   end
 
