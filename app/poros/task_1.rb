@@ -4,7 +4,8 @@ class Task1
   # that appear in either or both arrays. The returned array should have no duplicates.
 
   def unique_names(names1, names2)
-    #
+    names1 << names2
+    names1.flatten.uniq
   end
 
   # should print array of Ava, Emma, Olivia, Sophia in any order
@@ -20,5 +21,4 @@ class Task1
     names2 = ["Sophia", "Emma"]
     puts unique_names(names1, names2)
   end
-
 end
